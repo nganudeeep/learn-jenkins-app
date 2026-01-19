@@ -22,8 +22,9 @@ pipeline {
         }
         stage('Test'){
             steps{
+                sh '''
                 ls -la
-                grep build/index.html
+                grep build/index.html '''
                 npm test
             }
         }
