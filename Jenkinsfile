@@ -42,12 +42,7 @@ pipeline {
                             npm test
                             '''
                         }
-                        post {
-                            always{
-                                junit 'jest-results/junit.xml'
-                                publishHTML([allowMissing: false, alwaysLinkToLastBuild: false, icon: '', keepAll: false, reportDir: 'playwright-report', reportFiles: 'index.html', reportName: 'Playwright HTML Report', reportTitles: '', useWrapperFileDirectly: true])
-                            }
-                        }
+                        
                     }
                     stage('E2E test'){
                         agent{
@@ -103,7 +98,7 @@ pipeline {
                     reuseNode true
                 }
             }
-            
+
             environment{
                 CI_ENVIRONMENT_URL = 'https://endearing-empanada-2950a5.netlify.app'
             }
