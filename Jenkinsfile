@@ -27,7 +27,7 @@ pipeline {
         } 
     
 
-        stage('Run Tests'){
+        stage('Test'){
             parallel{
                 stage('unit test'){
                         agent{
@@ -71,8 +71,26 @@ pipeline {
         }
 
 
+        stage('Deploy Staging') {
+            agent{
+                docker{
+                    image 'node:18-alpine'
+                    reuseNode true
+                }
+            }
+            steps {
+               sh '''
+               npm install netlify-cli@20.1.1
+               node_modules/.bin/netlify --version
+               echo "Deploying to Staging Site ID: $NETLIFY_SITE_ID"
+               node_modules/.bin/netlify status
+               node_modules/.bin/netlify deploy --dir=build             #this is the only difference b/w Deploy Staging and Deploy Prod
+               '''
+            }
+        }
+
     
-        stage('Deploy') {
+        stage('Deploy Prod') {
             agent{
                 docker{
                     image 'node:18-alpine'
