@@ -87,8 +87,37 @@ pipeline {
                node_modules/.bin/netlify deploy --dir=build --json > deploy-output.json             #this is the only difference b/w Deploy Staging and Deploy Prod
                node_modules/.bin/node-jq -r '.deploy_url' deploy-output.json                        # install Jq tool , use that .son file for the details and parse the details
                '''
+                script{
+                    env.STAGING_URL = sh(script:"node_modules/.bin/node-jq -r '.deploy_url' deploy-output.json", returnStdout: true)
+                }
             }
         }
+
+        stage('Staging E2E'){
+            agent{
+                docker{
+                    image 'mcr.microsoft.com/playwright:v1.39.0-jammy'
+                    reuseNode true
+                }
+            }
+
+            environment{
+                CI_ENVIRONMENT_URL = "${env.STAGING_URL}"       #use double_quote to make accessable
+            }
+
+            steps{
+                sh '''
+                npx playwright test --reporter=html
+                '''
+            }
+
+            post {
+                always{
+                    junit 'jest-results/junit.xml'
+                    publishHTML([allowMissing: false, alwaysLinkToLastBuild: false, icon: '', keepAll: false, reportDir: 'playwright-report', reportFiles: 'index.html', reportName: 'Staging E2E', reportTitles: '', useWrapperFileDirectly: true])
+                }
+            }
+        }  
 
         // stage('Approval'){
         //     steps{
@@ -138,7 +167,7 @@ pipeline {
             post {
                 always{
                     junit 'jest-results/junit.xml'
-                    publishHTML([allowMissing: false, alwaysLinkToLastBuild: false, icon: '', keepAll: false, reportDir: 'playwright-report', reportFiles: 'index.html', reportName: 'Playwright E2E', reportTitles: '', useWrapperFileDirectly: true])
+                    publishHTML([allowMissing: false, alwaysLinkToLastBuild: false, icon: '', keepAll: false, reportDir: 'playwright-report', reportFiles: 'index.html', reportName: 'Prod E2E', reportTitles: '', useWrapperFileDirectly: true])
                 }
             }
         }  
