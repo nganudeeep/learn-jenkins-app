@@ -80,20 +80,23 @@ pipeline {
             }
             steps {
                sh '''
-               npm install netlify-cli@20.1.1
+               npm install netlify-cli@20.1.1 node-jq
                node_modules/.bin/netlify --version
                echo "Deploying to Staging Site ID: $NETLIFY_SITE_ID"
                node_modules/.bin/netlify status
-               node_modules/.bin/netlify deploy --dir=build             #this is the only difference b/w Deploy Staging and Deploy Prod
+               node_modules/.bin/netlify deploy --dir=build --json > deploy-output.json             #this is the only difference b/w Deploy Staging and Deploy Prod
+               node_modules/.bin/node-jq -r '.deploy_url' deploy-output.json                        # install Jq tool , use that .son file for the details and parse the details
                '''
             }
         }
 
-        stage('Approval'){
-            steps{
-                input message: 'Do you wish to Deploy to Production?', ok: 'Yes, I am Sure!'
-            }
-        }
+        // stage('Approval'){
+        //     steps{
+        //          timeout(time: 15, unit: 'MINUTES'){
+        //              input message: 'Do you wish to Deploy to Production?', ok: 'Yes, I am Sure!'
+        //         }
+        //     }
+        // }
     
         stage('Deploy Prod') {
             agent{
