@@ -102,7 +102,7 @@ pipeline {
             }
 
             environment{
-                CI_ENVIRONMENT_URL = "${env.STAGING_URL}"       #use double_quote to make accessable
+                CI_ENVIRONMENT_URL = "${env.STAGING_URL}"       //use double_quote to make accessable
             }
 
             steps{
