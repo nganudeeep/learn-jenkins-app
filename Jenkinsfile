@@ -27,6 +27,7 @@ pipeline {
             }
         }
     }
+}
 '''
         stage('Build') {
             agent{
@@ -160,6 +161,6 @@ pipeline {
                 }
             }
         } '''  
-    }
+    
 
 //end of file
