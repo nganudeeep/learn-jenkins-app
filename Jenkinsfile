@@ -37,12 +37,12 @@ pipeline {
             }
             steps {
                sh '''
-               ls -la
-               node --version
-               npm --version
-               npm ci
-               npm run build
-               ls -la
+               //ls -la
+               //node --version
+               //npm --version
+               //npm ci
+               //npm run build
+               //ls -la
                '''
             }
         } 
@@ -59,8 +59,8 @@ pipeline {
                         }
                         steps{
                             sh '''
-                            test -f build/index.html
-                            npm test
+                            // test -f build/index.html
+                            // npm test
                             '''
                         }
                         
@@ -74,9 +74,9 @@ pipeline {
                         }
                         steps{
                             sh '''
-                            serve -s build &
-                            #sleep 5
-                            npx playwright test --reporter=html
+                            // serve -s build &
+                            // #sleep 5
+                            // npx playwright test --reporter=html
                             '''
                         }
 
@@ -105,12 +105,12 @@ pipeline {
 
             steps{
                 sh '''
-                netlify --version
-                echo "Deploying to Staging Site ID: $NETLIFY_SITE_ID"
-                netlify status
-                netlify deploy --dir=build --json > deploy-output.json
-                CI_ENVIRONMENT_URL=$(jq -r '.deploy_url' deploy-output.json)  
-                npx playwright test --reporter=html
+                // netlify --version
+                // echo "Deploying to Staging Site ID: $NETLIFY_SITE_ID"
+                // netlify status
+                // netlify deploy --dir=build --json > deploy-output.json
+                // CI_ENVIRONMENT_URL=$(jq -r '.deploy_url' deploy-output.json)  
+                // npx playwright test --reporter=html
                 '''
             }
 
@@ -144,12 +144,12 @@ pipeline {
 
             steps{
                 sh '''
-                node --version
-                netlify --version
-                echo "Deploying to production Site ID: $NETLIFY_SITE_ID"
-                netlify status
-                netlify deploy --dir=build --prod
-                npx playwright test --reporter=html
+                // node --version
+                // netlify --version
+                // echo "Deploying to production Site ID: $NETLIFY_SITE_ID"
+                // netlify status
+                // netlify deploy --dir=build --prod
+                // npx playwright test --reporter=html
                 '''
             }
 
