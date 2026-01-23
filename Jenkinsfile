@@ -9,6 +9,25 @@ pipeline {
 
     stages {
 
+        stage('AWS'){
+            agent{
+                docker{
+                    image 'amazon/aws-cli'
+                    args "--entrypoint=''"
+                }
+            }
+            steps{
+                withCredentials([usernamePassword(credentialsId: 'my-aws', passwordVariable: 'AWS_SECRET_ACCESS_KEY', usernameVariable: 'AWS_ACCESS_KEY_ID')]) {
+                sh '''
+                    aws --version
+                    aws s3 ls
+                    aws iam list-users
+                '''
+                }
+            }
+        }
+    }
+'''
         stage('Build') {
             agent{
                 docker{
@@ -140,7 +159,7 @@ pipeline {
                     publishHTML([allowMissing: false, alwaysLinkToLastBuild: false, icon: '', keepAll: false, reportDir: 'playwright-report', reportFiles: 'index.html', reportName: 'Prod E2E', reportTitles: '', useWrapperFileDirectly: true])
                 }
             }
-        }  
+        } '''  
     }
-}
+
 //end of file
