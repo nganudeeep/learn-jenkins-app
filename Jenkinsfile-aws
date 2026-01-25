@@ -4,6 +4,9 @@ pipeline {
     environment{
          REACT_APP_VERSION = "1.2.$BUILD_ID"
          AWS_DEFAULT_REGION = "us-east-1"
+         AWS_ECS_CLUSTER = "JenkinsApp-Prod"
+         AWS_ECS_SERVICE_PROD = "JenkinsApp-Nginx"
+         AWS_ECS_TD_PROD = "JenkinsApp-Prod:Latest"
     }
 
     stages {
@@ -23,7 +26,8 @@ pipeline {
                     aws s3 ls
                     yum install jq -y
                     aws ecs register-task-definition --cli-input-json file://aws/task-defination.json
-                    aws ecs update-service --cluster JenkinsApp-Prod --service JenkinsApp-Nginx --task-definition JenkinsApp-Prod
+                    aws ecs update-service --cluster $AWS_ECS_CLUSTER --service $AWS_ECS_SERVICE_PROD --task-definition $AWS_ECS_TD_PROD
+                    aws ecs wait service-stable --cluster $AWS_ECS_CLUSTER --service $AWS_ECS_SERVICE_PROD
                 '''
                 }
             }
