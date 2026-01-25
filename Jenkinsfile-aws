@@ -13,7 +13,7 @@ pipeline {
                 docker{
                     image 'amazon/aws-cli'
                     reuseNode true
-                    args "--entrypoint=''"
+                    args "-u root --entrypoint=''"
                 }
             }
             steps{
@@ -21,6 +21,7 @@ pipeline {
                 sh '''
                     aws --version
                     aws s3 ls
+                    yum install jq -y
                     aws ecs register-task-definition --cli-input-json file://aws/task-defination.json
                     aws ecs update-service --cluster JenkinsApp-Prod --service JenkinsApp-Nginx --task-definition JenkinsApp-Prod
                 '''
