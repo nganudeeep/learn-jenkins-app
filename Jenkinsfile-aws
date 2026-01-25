@@ -3,18 +3,42 @@ pipeline {
 
     environment{
          REACT_APP_VERSION = "1.2.$BUILD_ID"
+         APP_NAME = "my-jenkinsapp"
          AWS_DEFAULT_REGION = "us-east-1"
          AWS_ECS_CLUSTER = "JenkinsApp-Prod"
          AWS_ECS_SERVICE_PROD = "JenkinsApp-Nginx"
          AWS_ECS_TD_PROD = "JenkinsApp-Prod:Latest"
+         AWS_DOCKER_REGISTER = "URL_OF_ECR"
     }
 
     stages {
 
+        stages {
+
+        stage('Build Docker Image'){
+            agent{
+                docker{
+                    image 'my-aws-cli'
+                    reuseNode true
+                    args "-u root -v var/run/docker.sock:var/run/docker.sock --entrypoint=''"
+                }
+            }
+            steps{
+                withCredentials([usernamePassword(credentialsId: 'my-aws', passwordVariable: 'AWS_SECRET_ACCESS_KEY', usernameVariable: 'AWS_ACCESS_KEY_ID')]) {
+                sh '''
+                    docker build -t $AWS_DOCKER_REGISTER/$APP_NAME:$REACT_APP_VERSION .
+                    aws ecr get-login-password | docker login --username AWS --password-stdin $AWS_DOCKER_REGISTRY
+                    docker push $AWS_DOCKER_REGISTER/$APP_NAME:$REACT_APP_VERSION
+                '''
+                }
+            }
+        }
+    }
+
         stage('AWS'){
             agent{
                 docker{
-                    image 'amazon/aws-cli'
+                    image 'my-aws-cli'
                     reuseNode true
                     args "-u root --entrypoint=''"
                 }
